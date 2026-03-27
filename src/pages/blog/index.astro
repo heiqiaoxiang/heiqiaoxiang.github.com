@@ -1,0 +1,122 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout title="博客">
+  <h1>博客</h1>
+  <p class="subtitle">思考、笔记与技术分享</p>
+
+  <div class="posts">
+    {sortedPosts.length === 0 ? (
+      <div class="empty">
+        <p>还没有文章</p>
+        <p class="hint">在 <code>src/content/blog/</code> 目录下添加 Markdown 文件即可创建文章</p>
+      </div>
+    ) : (
+      sortedPosts.map(post => (
+        <article class="post-card card">
+          <a href={`/blog/${post.slug}`}>
+            <div class="post-meta">
+              <time datetime={post.data.date.toISOString()}>
+                {post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="tags">
+                  {post.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                </div>
+              )}
+            </div>
+            <h2>{post.data.title}</h2>
+            {post.data.description && <p class="description">{post.data.description}</p>}
+          </a>
+        </article>
+      ))
+    )}
+  </div>
+</Layout>
+
+<style>
+  .subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: calc(var(--space-unit) * 6);
+    font-size: 1.1rem;
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-unit) * 3);
+  }
+
+  .empty {
+    text-align: center;
+    padding: calc(var(--space-unit) * 8) 0;
+  }
+
+  .empty p {
+    font-size: 1.1rem;
+    margin-bottom: calc(var(--space-unit) * 2);
+  }
+
+  .hint {
+    font-size: 0.9rem;
+  }
+
+  .post-card {
+    padding: 0;
+  }
+
+  .post-card a {
+    display: block;
+    padding: calc(var(--space-unit) * 3);
+    color: inherit;
+  }
+
+  .post-card:hover {
+    color: inherit;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-unit) * 2);
+    margin-bottom: var(--space-unit);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .post-meta time {
+    font-family: var(--font-mono);
+  }
+
+  .tags {
+    display: flex;
+    gap: var(--space-unit);
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  .post-card h2 {
+    font-size: 1.25rem;
+    margin: 0 0 var(--space-unit) 0;
+    transition: color 0.2s ease;
+  }
+
+  .post-card:hover h2 {
+    color: var(--color-accent);
+  }
+
+  .description {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+</style>
