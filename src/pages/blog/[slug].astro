@@ -1,0 +1,152 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <article class="post">
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime={post.data.date.toISOString()}>
+          {post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+        {post.data.tags && post.data.tags.length > 0 && (
+          <div class="tags">
+            {post.data.tags.map(tag => <span class="tag">{tag}</span>)}
+          </div>
+        )}
+      </div>
+      <h1>{post.data.title}</h1>
+      {post.data.description && <p class="description">{post.data.description}</p>}
+    </header>
+
+    <div class="post-content">
+      <Content />
+    </div>
+
+    <footer class="post-footer">
+      <a href="/blog" class="back-link">← 返回博客</a>
+    </footer>
+  </article>
+</Layout>
+
+<style>
+  .post {
+    max-width: 100%;
+  }
+
+  .post-header {
+    margin-bottom: calc(var(--space-unit) * 6);
+    padding-bottom: calc(var(--space-unit) * 4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-unit) * 2);
+    margin-bottom: calc(var(--space-unit) * 2);
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .post-meta time {
+    font-family: var(--font-mono);
+  }
+
+  .tags {
+    display: flex;
+    gap: var(--space-unit);
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  .post-header h1 {
+    margin-bottom: calc(var(--space-unit) * 2);
+  }
+
+  .description {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .post-content {
+    line-height: 1.8;
+  }
+
+  .post-content :global(h2) {
+    margin-top: calc(var(--space-unit) * 6);
+    margin-bottom: calc(var(--space-unit) * 2);
+  }
+
+  .post-content :global(h3) {
+    margin-top: calc(var(--space-unit) * 4);
+    margin-bottom: calc(var(--space-unit) * 2);
+  }
+
+  .post-content :global(p) {
+    margin-bottom: calc(var(--space-unit) * 3);
+  }
+
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    margin-bottom: calc(var(--space-unit) * 3);
+    padding-left: calc(var(--space-unit) * 4);
+  }
+
+  .post-content :global(li) {
+    margin-bottom: var(--space-unit);
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: calc(var(--space-unit) * 3);
+    margin: calc(var(--space-unit) * 3) 0;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .post-content :global(img) {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: calc(var(--space-unit) * 3) 0;
+  }
+
+  .post-content :global(a) {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .post-footer {
+    margin-top: calc(var(--space-unit) * 8);
+    padding-top: calc(var(--space-unit) * 4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+</style>
