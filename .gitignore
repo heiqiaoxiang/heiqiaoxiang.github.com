@@ -1,10 +1,25 @@
-_site/*
-_theme_packages/*
+# Astro
+node_modules/
+dist/
+.astro/
+.idea/
 
-Thumbs.db
+# OS
 .DS_Store
+Thumbs.db
 
-!.gitkeep
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-.rbenv-version
-.rvmrc
+# Environment
+.env
+.env.*
+!.env.example
+
+# Build
+build/
+gh-pages/
